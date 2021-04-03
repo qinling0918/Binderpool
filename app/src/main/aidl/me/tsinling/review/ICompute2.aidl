@@ -1,5 +1,5 @@
 // IBinderPool.aidl
-package me.tsinling.aidl;
+package me.tsinling.review;
 
 //
 

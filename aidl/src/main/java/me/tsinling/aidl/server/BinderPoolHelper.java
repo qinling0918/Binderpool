@@ -1,11 +1,12 @@
-package me.tsinling.aidl;
+package me.tsinling.aidl.server;
 
 import android.os.IBinder;
 import android.os.IInterface;
 import android.os.RemoteException;
-import android.util.Log;
 
 import java.util.HashMap;
+
+import me.tsinling.aidl.IBinderPool;
 
 /**
  * created by tsinling on: 2021/4/3 00:00
@@ -22,13 +23,13 @@ public class BinderPoolHelper {
         // 相同的aidl 文件名来查询获取对应的 实现类.
         // todo 也可以使用 putBinder()方法在类外扩展,此处是实现默认 Binder 类时使用.
 
-        mIBinders.put(ICompute.class,new ComputeImpl());
-        mIBinders.put(ICompute2.class,new Compute2Impl());
+       // mIBinders.put(ICompute.class,new ComputeImpl());
+       // mIBinders.put(ICompute2.class,new Compute2Impl());
     }
     private static class SingleTon {
         private static final BinderPoolHelper mBinderPoolImpl = new BinderPoolHelper();
     }
-    private static BinderPoolHelper getInstance(){
+    public static BinderPoolHelper getInstance(){
         return SingleTon.mBinderPoolImpl;
     }
     private static IBinder queryBinder(String binderClazzName){
@@ -51,14 +52,14 @@ public class BinderPoolHelper {
      * @return Binder 连接池注帮助类.
      */
 
-    public static BinderPoolHelper putBinder(Class<? extends IInterface> binderClazz, IBinder binder){
-        BinderPoolHelper helper = getInstance();
+    public  BinderPoolHelper putBinder(Class<? extends IInterface> binderClazz, IBinder binder){
+      //  BinderPoolHelper helper = getInstance();
         if (binder == null || binderClazz==null){
             // fixme 提示对应值不能为空. throw 出异常
-            return helper;
+            return this;
         }
-        helper.mIBinders.put(binderClazz,binder);
-        return helper;
+        mIBinders.put(binderClazz,binder);
+        return this;
     }
 
     /**
@@ -76,29 +77,6 @@ public class BinderPoolHelper {
         }
     }
 
-    private static class ComputeImpl extends ICompute.Stub {
 
-        private ComputeImpl() {
-            super();
-        }
 
-        @Override
-        public int add(int a, int b) throws RemoteException {
-            Log.d("BinderPoolHelper", "add pid "+android.os.Process.myPid());
-            return a+b;
-        }
-    }
-
-    private static class Compute2Impl extends ICompute2.Stub {
-
-        private Compute2Impl() {
-            super();
-        }
-
-        @Override
-        public int sub(int a, int b) throws RemoteException {
-            Log.d("BinderPoolHelper", "sub pid "+android.os.Process.myPid());
-            return a-b;
-        }
-    }
 }

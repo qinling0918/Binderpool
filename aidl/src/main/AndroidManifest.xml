@@ -4,11 +4,9 @@
 
     <application>
         <service
-            android:name=".BinderPoolService"
-
-            >
-            <!--android:enabled="true"
-            android:exported="true"-->
+            android:name=".server.BinderPoolService"
+            android:enabled="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="me.tsinling.aidl.BinderPoolService" />
             </intent-filter>
