@@ -1,3 +1,2 @@
-include ':aidl'
 include ':app'
 rootProject.name = "reviewAndroid"
