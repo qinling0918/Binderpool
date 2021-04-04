@@ -16,6 +16,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+
+        <service
+            android:name="me.tsinling.aidl.server.BinderPoolService"
+            android:process=":remote"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="me.tsinling.aidl.BinderPoolService" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

@@ -1,5 +1,6 @@
 package me.tsinling.review;
 
+import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 import android.util.Log;
 
@@ -14,7 +15,7 @@ public  class DataTypeImpl extends IDataType.Stub {
     private static final String TAG = "DataTypeImpl";
 
     private CopyOnWriteArrayList<Person> people = new CopyOnWriteArrayList<>();
-    private CopyOnWriteArrayList<Callback> callbacks = new CopyOnWriteArrayList<>();
+    private RemoteCallbackList<Callback> callbacks = new RemoteCallbackList<>();
 
     public DataTypeImpl() {
         super();
@@ -37,32 +38,32 @@ public  class DataTypeImpl extends IDataType.Stub {
 
         people.add(person);
 
-        if (!callbacks.isEmpty()){
-            for (Callback callback:callbacks) {
+        final int N = callbacks.beginBroadcast();
+        for (int i = 0; i < N; i++) {
+            Callback callback = callbacks.getBroadcastItem(i);
+            if (callback!=null){
                 callback.callback("person register succeed");
             }
+
         }
+        callbacks.finishBroadcast();
+
     }
 
     @Override
     public void registerListener(Callback callback) throws RemoteException {
-        if (callbacks.contains(callback) || callback==null){
-            Log.d(TAG, callback==null
-                    ?"registerListener:  callback is null"
-                    :"registerListener:  listener already exists ");
-            return;
-        }
-        callbacks.add(callback);
-        Log.d(TAG, "registerListener: listener.size: " + callbacks.size());
+        callbacks.register(callback);
+        final int N = callbacks.beginBroadcast();
+        callbacks.finishBroadcast();
+        Log.d(TAG, "registerListener: listener.size: " + N);
     }
 
     @Override
     public void unregisterListener(Callback callback) throws RemoteException {
-        if (callbacks.contains(callback)){
-            callbacks.remove(callback);
-            Log.d(TAG, "unregisterListener: unregister listener succeed " );
-        }
-        Log.d(TAG, "unregisterListener: listener.size: " + callbacks.size());
+        callbacks.unregister(callback);
+        final int N = callbacks.beginBroadcast();
+        callbacks.finishBroadcast();
+        Log.d(TAG, "unregisterListener: listener.size: " + N);
 
     }
 
