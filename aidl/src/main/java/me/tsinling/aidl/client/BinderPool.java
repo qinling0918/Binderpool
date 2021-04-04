@@ -275,6 +275,7 @@ public class BinderPool {
             Log.d(TAG, "BinderPool: onServiceConnected " );
              mIBinderPool = IBinderPool.Stub.asInterface(service);
             try {
+                // 为 Binder 设置一个死亡代理,若是 Binder 死亡将会受到通知.
                 mIBinderPool.asBinder().linkToDeath(mBinderPoolDeathRecipient, 0);
             } catch (RemoteException e) {
                 e.printStackTrace();
@@ -308,10 +309,14 @@ public class BinderPool {
         public void binderDied() {
 
             Log.w("BinderPool", "binder died.");
-
-            mIBinderPool.asBinder().unlinkToDeath(mBinderPoolDeathRecipient, 0);
-            mIBinderPool = null;
+            if (mIBinderPool!=null){
+                mIBinderPool.asBinder().unlinkToDeath(mBinderPoolDeathRecipient, 0);
+                mIBinderPool = null;
+            }
             mQuery = null;
+
+            // todo : 这里可以重新绑定远程 service
+            // bind
 
         }
 
