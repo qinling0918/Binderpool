@@ -2,6 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="me.tsinling.review">
 
+    <!--服务端自定义服务权限-->
+    <permission
+        android:name="me.tsinling.aidl.BINDER_POOL_SERVICE"
+        android:protectionLevel="normal" />
+
+    <!--客户端配置-->
+    <uses-permission android:name="me.tsinling.aidl.BINDER_POOL_SERVICE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -20,11 +28,12 @@
 
         <service
             android:name="me.tsinling.aidl.server.BinderPoolService"
-            android:process=":remote"
             android:enabled="true"
-            android:exported="true">
+            android:exported="true"
+            android:permission="me.tsinling.aidl.BINDER_POOL_SERVICE"
+            android:process=":remote">
             <intent-filter>
-                <action android:name="me.tsinling.aidl.BinderPoolService" />
+                <action android:name="me.tsinling.aidl.BINDER_POOL_SERVICE" />
             </intent-filter>
         </service>
     </application>

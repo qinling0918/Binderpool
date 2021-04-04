@@ -29,6 +29,10 @@ public class BinderPoolService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
+      /*  int check = checkCallingOrSelfPermission("me.tsinling.aidl.BINDER_POOL_SERVICE");
+        if (check == PackageManager.PERMISSION_DENIED){
+            return null;
+        }*/
          return BinderPoolHelper.DEFAULT_IBINDER;
     }
 

@@ -1,5 +1,8 @@
 package me.tsinling.review;
 
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.os.Parcel;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 import android.util.Log;
@@ -17,10 +20,15 @@ public  class DataTypeImpl extends IDataType.Stub {
     private CopyOnWriteArrayList<Person> people = new CopyOnWriteArrayList<>();
     private RemoteCallbackList<Callback> callbacks = new RemoteCallbackList<>();
 
+    private Context mContext;
     public DataTypeImpl() {
         super();
     }
-
+    // 会有上下文的构造,会执行权限校验.
+    public DataTypeImpl(Context mContext) {
+        super();
+        this.mContext = mContext;
+    }
 
     @Override
     public int basicTypes(int anInt, long aLong, boolean aBoolean, float aFloat, double aDouble, char achar, byte aByte, String aString, CharSequence aCharSequence) throws RemoteException {
@@ -44,8 +52,10 @@ public  class DataTypeImpl extends IDataType.Stub {
             if (callback!=null){
                 callback.callback("person register succeed");
             }
-
         }
+        // fixme 此处有回调给客户端的 callback, 所以要保证 客户端在接收到回调时,执行的不是耗时操作,
+        //  或者在线程中执行耗时操作.
+
         callbacks.finishBroadcast();
 
     }
@@ -71,5 +81,36 @@ public  class DataTypeImpl extends IDataType.Stub {
     @Override
     public boolean collectionTypes(List<String> list, List<Person> pList, String[] arr) throws RemoteException {
         return list== null || list.isEmpty();
+    }
+
+    @Override
+    public boolean onTransact(int code, Parcel data, Parcel reply, int flags) throws RemoteException {
+        if (permissionIsNotOk()) return false;
+        return super.onTransact(code, data, reply, flags);
+    }
+
+    /**
+     *  权限校验. 判断调用方的权限,以及包名是否 "me.tsinling"开头
+     *  一个应用想要远程调用服务中的方法,需要使用自定义的权限,包名好需要以"me.tsinling" 开始
+     *
+     *  此处上下文一直为 null ,所以该方法不会执行.
+     * @return
+     */
+    private boolean permissionIsNotOk() {
+        if (mContext!=null){
+            int check = mContext.checkCallingOrSelfPermission("me.tsinling.aidl.BINDER_POOL_SERVICE");
+            if (check == PackageManager.PERMISSION_DENIED){
+                return true;
+            }
+            String  packageName = null;
+            String[] packages = mContext.getPackageManager().getPackagesForUid(getCallingUid());
+            if (packages!=null && packages.length>0){
+                packageName = packages[0];
+            }
+            if (!packageName.startsWith("me.tsinling")){
+                return true;
+            }
+        }
+        return false;
     }
 }

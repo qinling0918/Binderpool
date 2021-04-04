@@ -21,7 +21,7 @@ public class BinderPool {
 //客户端通过标识符，获取相对应的Binder
 
     private static final String TAG = "BinderPool";
-    private static final String BIND_POOL_SERVICE = "me.tsinling.aidl.BinderPoolService";
+    private static final String BIND_POOL_SERVICE = "me.tsinling.aidl.BINDER_POOL_SERVICE";
     private  Context mContext;
 
     private IBinderPool mIBinderPool;
@@ -332,6 +332,8 @@ public class BinderPool {
            /* if (listener!=null){
                 listener.onServiceDisconnected();
             }*/
+            // todo 可以在这里重连,也可以在DeathRecipient.binderDied 中重连,
+            //此处为 主线程,
         }
 
     };
@@ -349,7 +351,8 @@ public class BinderPool {
             }
             mQuery = null;
 
-            // todo : 这里可以重新绑定远程 service
+            // todo : 这里可以重新绑定远程 service,此处为子线程(客户端的 Binder 线程池红)
+            // 不可以访问 UI
             // bind
 
         }
