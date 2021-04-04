@@ -6,11 +6,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
+import android.os.IInterface;
 import android.os.RemoteException;
 import android.util.Log;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
 import me.tsinling.aidl.IBinderPool;
@@ -30,7 +32,7 @@ public class BinderPool {
     private String remoteServicePackageName;
     private Query mQuery;
 
-
+    private static ConcurrentHashMap<Class, IInterface> sServices = new ConcurrentHashMap<Class, IInterface>();
     private BinderPool() {
 
     }
@@ -140,12 +142,32 @@ public class BinderPool {
 
     }
 
+    /**
+     *  获取远程服务所提供的服务类,此处将获取到的对象保存引用.
+     * @param binderClazz
+     * @param <S>
+     * @return
+     */
     public static <S extends android.os.IInterface> S queryBinder(Class<S> binderClazz ){
         Query mQuery = getInstance().bind();
         if (mQuery==null){
             return null;
         }
-        return mQuery.queryBinder(binderClazz);
+        if (null == binderClazz) {
+            throw new IllegalArgumentException("binderClazz can not be null");
+        }
+        S service = (S) sServices.get(binderClazz);
+
+        if (service == null){
+            service = mQuery.queryBinder(binderClazz);
+        }
+
+        if (service!=null && service.asBinder().isBinderAlive()){
+            sServices.put(binderClazz,service);
+            return service;
+        }
+
+        return null;
     }
 
     public  static boolean asyncQueryBinder(ServiceConnectListener listener) {
@@ -249,12 +271,22 @@ public class BinderPool {
             return obj;
         }
 
-        /*因为客户端没法收到从Service发送过来的Binder，利用该方法来执行Binder的方法*/
+
+
+        public boolean isBinderAlive(){
+            return  isBinderAlive(mIBinderPool);
+        }
+
+        private boolean isBinderAlive(IInterface mIBinder){
+            return  mIBinder != null
+                    && mIBinder.asBinder().isBinderAlive();
+        }
 
         private IBinder queryBinder(String binderClazzName) {
 
             IBinder binder = null;
             if ( mIBinderPool != null) {
+
                 try {
                     binder = mIBinderPool.queryBinder(binderClazzName);
                 } catch (RemoteException e) {

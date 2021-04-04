@@ -43,11 +43,13 @@ public class MainActivity extends AppCompatActivity {
     private void doWork(int a,int b) throws RemoteException{
 
         ICompute compute = BinderPool.queryBinder(ICompute.class);
+        ICompute compute_ = BinderPool.queryBinder(ICompute.class);
         Log.d(TAG, "doWork: add " + compute.add(a,b));
+        Log.d(TAG, "doWork: add " + compute_.add(a+b,b));
         ICompute2 compute2 = BinderPool.queryBinder(ICompute2.class);
         Log.d(TAG, "doWork: sub " + compute2.sub(a,b));
         IDataType dataType = BinderPool.queryBinder(IDataType.class);
-        Log.d(TAG, "doWork: parcelableTypes " + dataType.parcelableTypes(new Person()));
+      //  Log.d(TAG, "doWork: parcelableTypes " + dataType.parcelableTypes(new Person()));
         Log.d(TAG, "doWork: collectionTypes " + dataType.collectionTypes(new ArrayList<>(),new ArrayList<>(),new String[]{"1","2"}));
     }
 
@@ -63,7 +65,9 @@ public class MainActivity extends AppCompatActivity {
         BinderPool.asyncQueryBinder(new BinderPool.ServiceConnectListener() {
             @Override
             public void onServiceConnected(BinderPool.Query mQuery) {
-
+                if (!mQuery.isBinderAlive()) {
+                    return;
+                }
                 try {
                     doWork(1,1);
                 } catch (RemoteException e) {

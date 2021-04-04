@@ -16,12 +16,14 @@ interface IDataType {
   /**
      * 实现Parcelable的类 ,值传递 ,需要 import
      */
-    Person parcelableTypes(in Person person);
+    void parcelableTypes(in Person person);
 
       /**
       * 其他AIDL定义的AIDL接口,传递的是引用 ,需要 import
       */
-    void aidlTypes(in Callback callback);
+   // void aidlTypes(in Callback callback);
+    void registerListener(in Callback callback);
+    void unregisterListener(in Callback callback);
 
    /**
     * 集合类. 元素为基本数据类型以及 实现Parcelable的类

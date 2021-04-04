@@ -13,6 +13,7 @@ import me.tsinling.aidl.IBinderPool;
  * description: Binder 连接池帮助类.
  */
 public class BinderPoolHelper {
+    // 只读,所以未用 ConcurrentHashMap
     private final  HashMap<Class<? extends IInterface>, IBinder> mIBinders = new HashMap<>();
     public static final  IBinder DEFAULT_IBINDER = new BinderPoolImpl();
 
