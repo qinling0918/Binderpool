@@ -113,7 +113,7 @@ public class BinderPool {
     private  boolean asyncBind(ServiceConnectListener listener ) {
         if (isNotInited()) return false;
 
-        if (mQuery!=null &&  null!=listener){
+        if (mQuery!=null &&  null!=listener && mQuery.isBinderAlive()){
             listener.onServiceConnected(mQuery);
             return true;
         }
