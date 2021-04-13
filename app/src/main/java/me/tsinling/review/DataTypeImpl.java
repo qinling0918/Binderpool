@@ -12,7 +12,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * created by tsinling on: 2021/4/3 21:43
- * description:
+ * description: 测试Aidl支持的数据类型.
  */
 public  class DataTypeImpl extends IDataType.Stub {
     private static final String TAG = "DataTypeImpl";
