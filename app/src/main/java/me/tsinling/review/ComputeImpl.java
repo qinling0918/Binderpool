@@ -5,7 +5,7 @@ import android.util.Log;
 
 /**
  * created by tsinling on: 2021/4/3 21:43
- * description:
+ * description: 计算实现类
  */
 public  class ComputeImpl extends ICompute.Stub {
 
